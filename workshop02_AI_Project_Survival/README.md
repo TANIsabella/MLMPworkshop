@@ -1,49 +1,68 @@
-# Workshop 02 — AI Project Survival
+# Real-ESRGAN: enlarge one image with Python 3.13
 
 ## Project
 
-- **Repository:** https://github.com/xinntao/Real-ESRGAN
-- **Revision:** `a4abfb2979a7bbff3f69f58f58ae324608821e27`
-- **Inference task:** Use pretrained `RealESRGAN_x4plus` to upscale the included `0030.jpg` by 4× in each dimension. No training or face enhancement.
-- **Reproduction date:** 8 October 2026.
+**Repository:** [Real-ESRGAN on GitHub](https://github.com/xinntao/Real-ESRGAN)
 
-The repository was cloned again into `workshop02_projects/Real-ESRGAN_fresh`, separate from the class copy in `Real-ESRGAN`. A new `.venv` was created inside the fresh clone; neither class environment (`.venv` or `.venv313`) was reused. uv's download/build cache was initially available. To remove reliance on the cached BasicSR wheel, BasicSR was subsequently built from its pinned source archive with the compatibility fixes below, and inference was repeated.
+**Inference task:** Enlarge the example image `0030.jpg` from **220 × 220** to **880 × 880** pixels using an already-trained model. “Inference” means running that model on an image; no training is needed.
 
 ## Repo map
 
-| Item | Location / purpose |
+| Item | What we use |
 | --- | --- |
-| Environment | Linux x86_64; uv 0.11.22; CPython 3.13.14; fresh clone's `.venv`; CPU inference (`torch.cuda.is_available()` was false) |
-| Entry point | `inference_realesrgan.py`; its `main()` parses arguments, loads weights, reads images and writes results |
-| Model | `RealESRGAN_x4plus`: RRDBNet, 23 blocks, 64 features, native 4× scale; inference helper in `realesrgan/utils.py` |
-| Checkpoint | `weights/RealESRGAN_x4plus.pth`, from the upstream v0.1.0 release |
-| Input | `inputs/0030.jpg`, a 220×220 RGB illustration included in the repository |
-| Output | `results/0030_out.jpg`, 880×880 RGB JPEG |
-| Setup | `requirements.txt` declares dependencies; `setup.py` generates `realesrgan/version.py` and installs the local project |
+| Environment | Python **3.13.14**, uv, and a new `.venv` folder containing this project's Python packages. Tested on Linux using the CPU. |
+| Entry point | `inference_realesrgan.py` — the Python file that runs the model. |
+| Model | `RealESRGAN_x4plus`; its downloaded model file is `weights/RealESRGAN_x4plus.pth`. |
+| Input | `inputs/0030.jpg` — included with the project. |
+| Output | `results/0030_out.jpg` — the enlarged image. |
 
 ## Environment setup
 
-Run the following in a terminal. This recipe assumes `uv`, Git and curl are available. Choose an unused folder name if `Real-ESRGAN_fresh` already exists. All later commands run from the fresh clone, with its environment active.
+These instructions are for a **Linux terminal using bash or zsh**, such as the workshop computers. Git, curl and uv must already be installed. Check with:
 
 ```bash
-cd ~/Desktop/MLMPworkshop/workshop02_projects
-git clone https://github.com/xinntao/Real-ESRGAN.git Real-ESRGAN_fresh
-cd Real-ESRGAN_fresh
+git --version
+curl --version
+uv --version
+```
+
+If any command says “command not found”, install that tool using your computer's setup instructions before continuing.
+
+**Copy each complete command block, paste it into the terminal, and press Enter. Run the steps in order in the same terminal.** Wait until the prompt returns before continuing. If a command reports an error, stop at that step.
+
+### 1. Download a fresh copy and select Python 3.13
+
+This creates a new working folder outside your `MLMPworkshop` submission repository. The date and time in its name prevent clashes with an earlier attempt.
+
+```bash
+mkdir -p ~/realesrgan_practice
+cd ~/realesrgan_practice
+project_dir="Real-ESRGAN_fresh_$(date +%Y%m%d_%H%M%S)"
+git clone https://github.com/xinntao/Real-ESRGAN.git "$project_dir"
+cd "$project_dir"
 git checkout a4abfb2979a7bbff3f69f58f58ae324608821e27
 uv python install 3.13.14
 uv venv --python 3.13.14 .venv
 source .venv/bin/activate
 python --version
+which python
 ```
 
-On the reproduction machine Python 3.13.14 was already installed, so `uv venv --python 3.13 .venv` selected it. The explicit patch version above makes that selection repeatable.
+You should see **Python 3.13.14** and a Python path ending in **`.venv/bin/python`**. This is a new environment; do not activate your class `.venv` or `.venv313`.
 
-### Pin the dependencies
+Stay in this folder for every remaining step.
 
-The first fresh installation used `uv pip install --python .venv/bin/python -r requirements.txt`. Because upstream requirements have few version limits, the following is the exact resolved dependency snapshot, subsequently checked with uv. Save it using this terminal block. BasicSR and Real-ESRGAN are installed separately from patched source below.
+### 2. Install the supporting packages
+
+The expandable block below contains the package versions recorded from the successful environment. You do not need to understand or edit the list. **Expand it and paste the entire block.** Downloads may take several minutes.
+
+`--no-deps` installs this complete list without automatically installing BasicSR yet. We fix and install BasicSR in Step 3 because its original setup code can fail on Python 3.13.
+
+<details>
+<summary><strong>Click to show the package-installation block</strong></summary>
 
 ```bash
-cat > /tmp/realesrgan-dependencies.txt <<'PINS'
+cat > reproduction-packages.txt <<'PINS'
 ImageIO==2.38.0
 Jinja2==3.1.6
 Markdown==3.11
@@ -116,20 +135,24 @@ typing_extensions==4.16.0
 urllib3==2.8.0
 yapf==0.43.0
 PINS
-uv pip install --python .venv/bin/python -r /tmp/realesrgan-dependencies.txt
+uv pip install --python .venv/bin/python --no-deps -r reproduction-packages.txt
 ```
 
-These pins record this Linux environment, including PyTorch's CUDA dependencies even though inference ran on CPU. They are not a claim of portability to every operating system.
+</details>
 
-### Apply the Python 3.13 and torchvision compatibility fixes
+### 3. Fix the Python 3.13 compatibility problems
 
-Download the exact BasicSR source release. Keeping the source outside `.venv` makes the patch explicit and avoids depending on a previously edited cached wheel.
+**The important change is in `setup.py`: replace the entire `get_version()` function.** It is a Python function, not a terminal command or a comment. The original version can fail with `KeyError: '__version__'` under Python 3.13.
+
+The block below makes that edit automatically. It applies the same fix to BasicSR, a library used by Real-ESRGAN, and fixes BasicSR's outdated torchvision import.
+
+First download BasicSR's source code:
 
 ```bash
-curl -fL https://files.pythonhosted.org/packages/86/41/00a6b000f222f0fa4c6d9e1d6dcc9811a374cabb8abb9d408b77de39648c/basicsr-1.4.2.tar.gz -o /tmp/basicsr-1.4.2.tar.gz
+curl -fL https://files.pythonhosted.org/packages/86/41/00a6b000f222f0fa4c6d9e1d6dcc9811a374cabb8abb9d408b77de39648c/basicsr-1.4.2.tar.gz -o basicsr-1.4.2.tar.gz
 ```
 
-Paste this **whole block** into the terminal, including `python - <<'PY'` and the final `PY`. It checks the archive, extracts it safely, fixes version lookup in both setup scripts, and changes BasicSR's grayscale import to the public torchvision API.
+Now **paste this whole block**, starting with `python - <<'PY'` and ending with the final `PY`. Those first and last lines allow Python code to run from your terminal. Do not paste just the `def get_version()` lines into zsh.
 
 ```bash
 python - <<'PY'
@@ -137,10 +160,10 @@ from pathlib import Path
 import hashlib
 import tarfile
 
-archive = Path('/tmp/basicsr-1.4.2.tar.gz')
+archive = Path('basicsr-1.4.2.tar.gz')
 assert hashlib.sha256(archive.read_bytes()).hexdigest() == 'b89b595a87ef964cda9913b4d99380ddb6554c965577c0c10cb7b78e31301e87'
-with tarfile.open(archive) as tf:
-    tf.extractall('vendor', filter='data')
+with tarfile.open(archive) as package:
+    package.extractall('vendor', filter='data')
 
 replacement = """def get_version():
     namespace = {}
@@ -148,6 +171,7 @@ replacement = """def get_version():
         exec(compile(f.read(), version_file, 'exec'), namespace)
     return namespace['__version__']
 """
+
 for filename in ('setup.py', 'vendor/basicsr-1.4.2/setup.py'):
     path = Path(filename)
     source = path.read_text()
@@ -156,110 +180,126 @@ for filename in ('setup.py', 'vendor/basicsr-1.4.2/setup.py'):
     path.write_text(source[:start] + replacement + source[end:])
 
 path = Path('vendor/basicsr-1.4.2/basicsr/data/degradations.py')
-source = path.read_text()
-source = source.replace(
+source = path.read_text().replace(
     'from torchvision.transforms.functional_tensor import rgb_to_grayscale',
     'from torchvision.transforms.functional import rgb_to_grayscale')
 path.write_text(source)
+print('Compatibility fixes applied.')
 PY
+```
+
+Expect `Compatibility fixes applied.` Then install the corrected library and the local project:
+
+```bash
 uv pip install --python .venv/bin/python --no-deps ./vendor/basicsr-1.4.2
 uv pip install --python .venv/bin/python --no-deps -e .
 ```
 
-The final command installs the fresh project in editable mode and generates `realesrgan/version.py`. `--no-deps` preserves the explicitly installed dependency versions. Build isolation may fetch build tools separately; the runtime versions are pinned above.
+The last command also creates `realesrgan/version.py`. Installing only `requirements.txt` does not complete this project setup.
 
-### Download the pretrained checkpoint
+### 4. Download the trained model
+
+A “checkpoint” is the file containing what the model learned during training. Download it into `weights`:
 
 ```bash
+mkdir -p weights
 curl -fL https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth -o weights/RealESRGAN_x4plus.pth
 ```
 
-Checkpoint SHA-256: `4fa0d38905f75ac06eb49a7951b426670021be3018265fd191d2125df9d682f1`.
-
 ## Inference
 
-Exact command executed in the fresh clone:
+### 5. Enlarge one image
+
+Copy and run:
 
 ```bash
 OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 .venv/bin/python inference_realesrgan.py -n RealESRGAN_x4plus -i inputs/0030.jpg -o results --outscale 4 --fp32
 ```
 
-`--fp32` selects full precision. The two environment variables limit CPU threads. `-i` names one actual JPEG, not the entire mixed-input folder. `--face_enhance` is omitted because this task needs only the Real-ESRGAN checkpoint. The script chooses the CPU when CUDA is unavailable.
+This selects the model, reads `0030.jpg`, enlarges it 4× and saves the result in `results`. The first two settings limit CPU threads; `--fp32` uses full precision. A GPU is not required.
 
-Successful terminal output:
+You should see:
 
 ```text
 Testing 0 0030
 ```
 
-The process exited with code 0. The generated image is `results/0030_out.jpg`; `_out` is the script's default suffix and it retains the input extension.
+**Wait for the terminal prompt to return.** The message means processing started; the next step checks that it finished.
 
-## Evidence and verification
+### 6. Check and open the result
 
-| Evidence | Source in fresh clone | Dimensions | Format |
-| --- | --- | --- | --- |
-| [Input](evidence/input.jpg) | `inputs/0030.jpg` | 220×220 | RGB JPEG |
-| [Output](evidence/output.jpg) | `results/0030_out.jpg` | 880×880 | RGB JPEG |
+```bash
+python - <<'PY'
+from PIL import Image
 
-Both images were opened successfully with Pillow. The output dimensions were checked to be exactly four times the input dimensions, and the generated output was visually inspected. This verifies a completed inference and valid output, not a quantitative restoration-quality score. There is no high-resolution ground truth in this submission.
-
-![Input image](evidence/input.jpg)
-
-![Real-ESRGAN output](evidence/output.jpg)
-
-SHA-256 checksums of the submitted evidence:
-
-```text
-2f49c8cf6249940408fff736f394a4f8a228a6488bcc2fe9f92bdfb90b54a504  evidence/input.jpg
-df1c6672dd9a6505237696e659cf8bd151ecc64bbc2c88dd0066ae4428f11898  evidence/output.jpg
+with Image.open('inputs/0030.jpg') as original:
+    original.load()
+    input_size = original.size
+with Image.open('results/0030_out.jpg') as result:
+    result.load()
+    output_size = result.size
+assert output_size == (input_size[0] * 4, input_size[1] * 4)
+print('Input:', input_size)
+print('Output:', output_size)
+print('PASS: the output exists, opens, and is four times wider and taller.')
+PY
 ```
 
-Numerical and JPEG differences can occur with other hardware or library versions; the checksums identify these submitted artifacts.
+Expected sizes: `Input: (220, 220)` and `Output: (880, 880)`.
+
+Open the output in Linux's image viewer:
+
+```bash
+xdg-open results/0030_out.jpg
+```
+
+You can also open the fresh project folder in VS Code, expand **results**, and click **0030_out.jpg**. Compare it with `inputs/0030.jpg`: the picture should show the same subject at a larger resolution.
+
+**Use the exact filename `0030.jpg`, not `0030.png`.** An incorrect input path can make this script finish without producing an image.
+
+## Evidence
+
+The submitted images came from the successful fresh-clone run on **8 October 2026**, using Python 3.13.14 and a separate environment.
+
+| File | Description |
+| --- | --- |
+| [evidence/input.jpg](evidence/input.jpg) | Copy of `inputs/0030.jpg`, 220 × 220 pixels. |
+| [evidence/output.jpg](evidence/output.jpg) | Copy of `results/0030_out.jpg`, 880 × 880 pixels. |
+
+Only this README and these two images belong in the submission. Do not add the working clone, `.venv`, model checkpoint or caches to `MLMPworkshop`.
 
 ## One real failure
 
-**Category:** Python-version / package-build compatibility.
+**Category:** PYTHON VERSION.
 
-**Observed command:** `uv pip install --python .venv/bin/python --no-deps -e .` on the unmodified fresh clone under Python 3.13.14.
-
-**Observed error:**
+**Problem:** Installing the local Real-ESRGAN project under Python 3.13 failed inside `setup.py`, in `get_version()`, with:
 
 ```text
-File "<string>", line 86, in <module>
-File "<string>", line 72, in get_version
 KeyError: '__version__'
 ```
 
-**Root cause:** `setup.py` executes the version file and then expects `locals()['__version__']` to contain the new variable. That implicit-locals pattern fails under Python 3.13.
+**Root cause:** The original function runs the version file using `exec()` and then looks for the result through `locals()`. That approach does not retrieve the newly created variable under Python 3.13.
 
-**Minimal fix:** Pass an explicit dictionary to `exec()` and read `__version__` from that same dictionary, as shown in the setup block. The editable installation then succeeded. The same fix is applied to BasicSR's source setup code to avoid its equivalent build problem on a machine with no cached wheel.
-
-**Other class troubleshooting:** BasicSR imported the removed `torchvision.transforms.functional_tensor` module; the reproducible setup uses `torchvision.transforms.functional` instead. An earlier whole-folder run with `--face_enhance` failed on grayscale input with shapes `(1404, 2000, 1)` versus `(1404, 2000)`. A single RGB input without face enhancement avoids that separate path. Specifying `0030.png` also produced no result because the repository's file is `0030.jpg`.
+**Minimal fix:** Replace the entire `get_version()` function with the version shown in Step 3. It creates a dictionary called `namespace`, runs the code using that dictionary, and reads `__version__` from it. Re-running the local installation then succeeded.
 
 ## AI agent check
 
-**Which AI coding agent did you use?** OpenAI Codex in the IDE.
+**Which AI coding agent did you use?** OpenAI Codex in VS Code.
 
-**What advice did it give?** It helped identify the active Python environment, explain that `cv2` comes from `opencv-python`, fix BasicSR's torchvision import and Python 3.13 version lookup, install the local project to generate `realesrgan/version.py`, and select the correct JPEG path. Its initial explanation for a failed-then-successful BasicSR installation remained uncertain; the original log did not establish why the retry succeeded.
+**What advice did it give?** Use the correct virtual environment, replace `get_version()` for Python 3.13, correct BasicSR's torchvision import, install the local project, and use the actual input filename `0030.jpg`.
 
-**What command or fix did you choose to run yourself?** During class troubleshooting I ran the installation and inference commands in my terminal and edited the suggested compatibility code. After a failed whole-folder face-enhancement run, I used the single-image `0030.jpg` inference command and confirmed success in the conversation. For this final assignment, I explicitly authorized Codex to create the fresh clone, build the separate environment, repeat inference, verify the artifacts and write this report. The fresh-run commands were executed by the agent, not claimed as manual student execution.
+**What command or fix did you choose to run yourself?** During class troubleshooting, I edited `setup.py` and ran the installation and inference commands myself. Later, I authorized Codex to perform the separate fresh-clone run and prepare the evidence and README. The fresh-run execution was agent-assisted.
 
-**How did you verify the result?** In class I inspected the saved result in VS Code. For the fresh reproduction, Codex checked exit code 0, opened the files, confirmed 220×220 → 880×880 RGB dimensions, visually inspected the output, and recorded hashes. The submitted output comes from the fresh run, not the class results folder.
+**How did you verify the result?** I inspected the class result in VS Code. For the fresh run, Codex checked successful completion, opened the output, confirmed the size changed from 220 × 220 to 880 × 880, and visually inspected it. Step 6 lets the reviewer repeat those checks.
 
-## Submission scope
+## Peer reproduction — to be completed by another student
 
-```text
-workshop02_AI_Project_Survival/
-├── README.md
-└── evidence/
-    ├── input.jpg
-    └── output.jpg
-```
+Follow Steps 1–6 from a new clone using only this README, then record:
 
-Only these three files belong in the submission. The fresh clone, environments, downloaded source, checkpoint, datasets and package/model caches remain outside this folder. When committing, add this folder explicitly; do not use `git add .` from the parent repository containing the working clones.
+- **Reviewer:** Not yet recorded.
+- **Reproduction result:** Not yet tested by a peer (PASS / FAIL).
+- **Failed step, if any:**
+- **Missing information, if any:**
+- **Suggested fix, if any:**
 
-## Repository references
-
-- [Upstream README at the reproduced revision](https://github.com/xinntao/Real-ESRGAN/blob/a4abfb2979a7bbff3f69f58f58ae324608821e27/README.md)
-- [Inference script at that revision](https://github.com/xinntao/Real-ESRGAN/blob/a4abfb2979a7bbff3f69f58f58ae324608821e27/inference_realesrgan.py)
-- [Project setup script at that revision](https://github.com/xinntao/Real-ESRGAN/blob/a4abfb2979a7bbff3f69f58f58ae324608821e27/setup.py)
+Update these instructions after receiving the reviewer's feedback.
