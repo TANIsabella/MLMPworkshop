@@ -32,7 +32,7 @@ If any command says “command not found”, install that tool using your comput
 
 ### 1. Download a fresh copy and select Python 3.13
 
-**$\color{#FC0FC0}{\text{This folder called "realesrgan\_practice" is created in your HOME directory}}$**
+$\color{#FC0FC0}{This\ folder\ called\ "realesrgan\_practice"\ is\ created\ in\ your\ HOME\ directory}$
 
 This creates a new working folder OUTSIDE your `MLMPworkshop` submission repository. 
 
