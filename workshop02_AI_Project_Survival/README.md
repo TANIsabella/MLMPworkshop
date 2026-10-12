@@ -32,7 +32,7 @@ If any command says “command not found”, install that tool using your comput
 
 ### 1. Download a fresh copy and select Python 3.13
 
-$\color{#FC0FC0}{This\Folder\called\realesrgan_practice\is\created\in\your\HOME\directory}$
+$\color{#FC0FC0}{This\ Folder\ called\ realesrgan_practice\ is\ created\ in\ your\ HOME\ directory}$
 This creates a new working folder OUTSIDE your `MLMPworkshop` submission repository. 
 
 ```bash
@@ -141,7 +141,7 @@ uv pip install --python .venv/bin/python --no-deps -r reproduction-packages.txt
 
 </details>
 
-$\color{#FC0FC0}{YES\Paste\the\whole\thing}$
+$\color{#FC0FC0}{YES \ Paste\ the\ whole\ thing}$
 
 ### 3. Fix the Python 3.13 compatibility problems
 
