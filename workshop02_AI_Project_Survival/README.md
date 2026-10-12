@@ -232,7 +232,7 @@ Testing 0 0030
 
 ### 6. Check and open the result
 
-**$\color{#FC0FC0}{Go\ back\ to\ your\ HOME\ directory, It's\ in\ your\ HOME\ directory}$**
+$\color{#FC0FC0}{It's\ in\ your\ HOME\ directory,\ Not\ in\ your\ MLMPworkshop\ directory}$
 
 You can open the fresh project folder in $\color{#FC0FC0}{VS\ Code}$, expand **results**, and click **0030_out.jpg**. Compare it with `inputs/0030.jpg`: the picture should show the same subject at a larger resolution.
 
