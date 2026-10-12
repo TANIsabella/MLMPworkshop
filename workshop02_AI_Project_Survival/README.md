@@ -32,7 +32,8 @@ If any command says “command not found”, install that tool using your comput
 
 ### 1. Download a fresh copy and select Python 3.13
 
-This creates a new working folder outside your `MLMPworkshop` submission repository. The date and time in its name prevent clashes with an earlier attempt.
+$\color{#FC0FC0}{This\Folder\called\realesrgan_practice\is\created\in\your\HOME\directory}$
+This creates a new working folder OUTSIDE your `MLMPworkshop` submission repository. 
 
 ```bash
 mkdir -p ~/realesrgan_practice
@@ -59,7 +60,7 @@ The expandable block below contains the package versions recorded from the succe
 `--no-deps` installs this complete list without automatically installing BasicSR yet. We fix and install BasicSR in Step 3 because its original setup code can fail on Python 3.13.
 
 <details>
-<summary><strong>Click to show the package-installation block</strong></summary>
+<summary><strong>EXPAND ME EXPAND ME EXPAND ME to show the package-installation block</strong></summary>
 
 ```bash
 cat > reproduction-packages.txt <<'PINS'
@@ -139,6 +140,8 @@ uv pip install --python .venv/bin/python --no-deps -r reproduction-packages.txt
 ```
 
 </details>
+
+$\color{#FC0FC0}{YES\Paste\the\whole\thing}$
 
 ### 3. Fix the Python 3.13 compatibility problems
 
