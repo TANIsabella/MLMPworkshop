@@ -32,7 +32,7 @@ If any command says “command not found”, install that tool using your comput
 
 ### 1. Download a fresh copy and select Python 3.13
 
-$\color{#FC0FC0}{This\ Folder\ called\ realesrgan_practice\ is\ created\ in\ your\ HOME\ directory}$
+$\color{#FC0FC0}{This\ Folder\ called\ "realesrgan_practice"\ is\ created\ in\ your\ HOME\ directory}$
 This creates a new working folder OUTSIDE your `MLMPworkshop` submission repository. 
 
 ```bash
@@ -231,32 +231,9 @@ Testing 0 0030
 
 ### 6. Check and open the result
 
-```bash
-python - <<'PY'
-from PIL import Image
+$\color{#FC0FC0}{Go\ back\ to\ your\ HOME\ directory, It's\ in\ your\ HOME\ directory}$
 
-with Image.open('inputs/0030.jpg') as original:
-    original.load()
-    input_size = original.size
-with Image.open('results/0030_out.jpg') as result:
-    result.load()
-    output_size = result.size
-assert output_size == (input_size[0] * 4, input_size[1] * 4)
-print('Input:', input_size)
-print('Output:', output_size)
-print('PASS: the output exists, opens, and is four times wider and taller.')
-PY
-```
-
-Expected sizes: `Input: (220, 220)` and `Output: (880, 880)`.
-
-Open the output in Linux's image viewer:
-
-```bash
-xdg-open results/0030_out.jpg
-```
-
-You can also open the fresh project folder in VS Code, expand **results**, and click **0030_out.jpg**. Compare it with `inputs/0030.jpg`: the picture should show the same subject at a larger resolution.
+You can open the fresh project folder in $\color{#FC0FC0}{VS\ Code}$, expand **results**, and click **0030_out.jpg**. Compare it with `inputs/0030.jpg`: the picture should show the same subject at a larger resolution.
 
 **Use the exact filename `0030.jpg`, not `0030.png`.** An incorrect input path can make this script finish without producing an image.
 
