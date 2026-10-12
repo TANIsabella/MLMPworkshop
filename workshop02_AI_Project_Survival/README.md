@@ -32,7 +32,8 @@ If any command says “command not found”, install that tool using your comput
 
 ### 1. Download a fresh copy and select Python 3.13
 
-$\color{#FC0FC0}{This\ Folder\ called\ "realesrgan_practice"\ is\ created\ in\ your\ HOME\ directory}$
+**$\color{#FC0FC0}{\text{This folder called "realesrgan\_practice" is created in your HOME directory}}$**
+
 This creates a new working folder OUTSIDE your `MLMPworkshop` submission repository. 
 
 ```bash
@@ -141,7 +142,7 @@ uv pip install --python .venv/bin/python --no-deps -r reproduction-packages.txt
 
 </details>
 
-$\color{#FC0FC0}{YES \ Paste\ the\ whole\ thing}$
+**$\color{#FC0FC0}{YES \ Paste\ the\ whole\ thing}$**
 
 ### 3. Fix the Python 3.13 compatibility problems
 
@@ -231,7 +232,7 @@ Testing 0 0030
 
 ### 6. Check and open the result
 
-$\color{#FC0FC0}{Go\ back\ to\ your\ HOME\ directory, It's\ in\ your\ HOME\ directory}$
+**$\color{#FC0FC0}{Go\ back\ to\ your\ HOME\ directory, It's\ in\ your\ HOME\ directory}$**
 
 You can open the fresh project folder in $\color{#FC0FC0}{VS\ Code}$, expand **results**, and click **0030_out.jpg**. Compare it with `inputs/0030.jpg`: the picture should show the same subject at a larger resolution.
 
