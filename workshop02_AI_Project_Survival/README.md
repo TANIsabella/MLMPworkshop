@@ -277,10 +277,10 @@ KeyError: '__version__'
 
 Follow Steps 1–6 from a new clone using only this README, then record:
 
-- **Reviewer:** Not yet recorded.
-- **Reproduction result:** Not yet tested by a peer (PASS / FAIL).
-- **Failed step, if any:**
-- **Missing information, if any:**
-- **Suggested fix, if any:**
+- **Reviewer:** Xinnuo Zhou
+- **Reproduction result:** PASS
+- **Failed step, if any:** NO
+- **Missing information, if any:** NO
+- **Suggested fix, if any:** pretty good
 
 Update these instructions after receiving the reviewer's feedback.
