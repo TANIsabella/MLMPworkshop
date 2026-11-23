@@ -1,0 +1,24 @@
+[project]
+name = "assignment02-logistic-regression"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "TANIsabella", email = "s5915518@bournemouth.ac.uk" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "ipykernel>=7.4.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "notebook>=7.6.5",
+    "numpy>=2.5.5",
+    "scikit-learn>=1.9.1",
+]
+
+[project.scripts]
+assignment02-logistic-regression = "assignment02_logistic_regression:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
