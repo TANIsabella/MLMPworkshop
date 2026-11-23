@@ -1,0 +1,22 @@
+[project]
+name = "workshop04-python-numpy-linearregression"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "TANIsabella", email = "s5915518@bournemouth.ac.uk" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "notebook>=7.6.3",
+    "numpy>=2.5.4",
+]
+
+[project.scripts]
+workshop04-python-numpy-linearregression = "workshop04_python_numpy_linearregression:main"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"

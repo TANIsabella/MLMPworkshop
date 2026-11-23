@@ -4,4 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "numpy>=2.5.4",
+    "scikit-learn>=1.9.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "workshop04_Python_Numpy_LinearRegression",
+    "workshop_04_Python_Numpy_LinearRegression_v2",
+    "assignment02_Logistic_Regression",
+]
